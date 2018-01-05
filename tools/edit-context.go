@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"sort"
 )
 
 type FileContext struct {
@@ -74,10 +75,29 @@ func (context *EditContext) RenameFiles() error {
 		} else {
 			fmt.Printf("REN: %s to \n └── %s\n", file.Path, file.TargetPath)
 		}
-
 	}
 
 	return nil
+}
+
+func (context *EditContext) Sort(field string, ascending bool) {
+	fmt.Printf("Sorting on %s, ascending? %s\n", field, ascending)
+
+	var fileSort sort.Interface
+
+	if field == "name" {
+		fileSort = FileContextsByName(context.Files)
+	} else if field == "date" {
+		fileSort = FileContextsByDate(context.Files)
+	} else {
+		return
+	}
+
+	if ascending {
+		sort.Sort(fileSort)
+	} else {
+		sort.Sort(sort.Reverse(fileSort))
+	}
 }
 
 func listFiles(path string, recursive bool) []FileContext {

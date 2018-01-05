@@ -12,8 +12,10 @@ type EditCommand struct {
 	fileTools *FileTools
 	flagSet   *flag.FlagSet
 
-	path      string
-	recursive bool
+	path       string
+	recursive  bool
+	sort       string
+	descending bool
 }
 
 func EditCommandNew(fileTools *FileTools) *EditCommand {
@@ -25,8 +27,12 @@ func EditCommandNew(fileTools *FileTools) *EditCommand {
 
 	flagSet := flag.NewFlagSet("edit", flag.ExitOnError)
 	flagSet.StringVar(&editCommand.path, "path", currentPath, "Path")
-	flagSet.BoolVar(&editCommand.recursive, "recursive", false, "Recursive")
-	flagSet.BoolVar(&editCommand.recursive, "r", false, "Recursive")
+
+	flagSet.BoolVar(&editCommand.recursive, "recursive", false, "Edit files in current and child directories")
+	flagSet.BoolVar(&editCommand.recursive, "r", false, "Shorthand for -recursive")
+
+	flagSet.StringVar(&editCommand.sort, "sort", "name", "Sort [name, date]")
+	flagSet.BoolVar(&editCommand.descending, "desc", false, "Sort in descending order")
 
 	editCommand.flagSet = flagSet
 
@@ -41,6 +47,11 @@ func (command *EditCommand) Init() {
 }
 
 func (command *EditCommand) Validate() bool {
+	if command.sort != "name" && command.sort != "date" {
+		fmt.Printf("%s is not a valid sort field. Please use name or date\n", command.sort)
+		return false
+	}
+
 	return true
 }
 
@@ -50,6 +61,7 @@ func (command *EditCommand) Usage() {
 
 func (command *EditCommand) Execute() {
 	editContext := EditContextNew(command.path, command.recursive)
+	editContext.Sort(command.sort, !command.descending)
 	filePaths := editContext.GetPaths(false)
 
 	editContent := []byte(strings.Join(filePaths, "\n"))
