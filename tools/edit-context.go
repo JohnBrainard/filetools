@@ -71,9 +71,14 @@ func (context *EditContext) SetTargetPathTemplate(template string) {
 func (context *EditContext) RenameFiles() error {
 	for _, file := range context.Files {
 		if strings.Compare(file.Path, file.TargetPath) == 0 {
-			fmt.Printf("Skpping %s. No changes.\n", file.Path)
+			// TODO: Add verbose logging
+			//fmt.Printf("Skipping %s. No changes.\n", file.Path)
 		} else {
 			fmt.Printf("REN: %s to \n └── %s\n", file.Path, file.TargetPath)
+			err := os.Rename(file.Path, file.TargetPath)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err)
+			}
 		}
 	}
 
@@ -81,8 +86,6 @@ func (context *EditContext) RenameFiles() error {
 }
 
 func (context *EditContext) Sort(field string, ascending bool) {
-	fmt.Printf("Sorting on %s, ascending? %s\n", field, ascending)
-
 	var fileSort sort.Interface
 
 	if field == "name" {

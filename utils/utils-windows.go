@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const NewLineSeparator = "\r\n"
+
 func GetSystemEditor(fileName string) *exec.Cmd {
 	editor := os.Getenv("EDITOR")
 	editorArgs := os.Getenv("EDITOR_ARGS")

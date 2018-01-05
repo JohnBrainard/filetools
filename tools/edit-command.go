@@ -64,9 +64,8 @@ func (command *EditCommand) Execute() {
 	editContext.Sort(command.sort, !command.descending)
 	filePaths := editContext.GetPaths(false)
 
-	editContent := []byte(strings.Join(filePaths, "\n"))
+	editContent := []byte(strings.Join(filePaths, utils.NewLineSeparator))
 	editContent = utils.EditTempFile(editContent)
-	fmt.Printf("Edited File Names: \n%s\n", editContent)
 
 	targetPaths := getTargetPaths(string(editContent))
 
@@ -74,7 +73,6 @@ func (command *EditCommand) Execute() {
 		fmt.Printf("Filename templates aren't currently supported")
 		editContext.SetTargetPathTemplate(targetPaths[0])
 	} else if len(targetPaths) == len(filePaths) {
-		fmt.Printf("Renaming files to:\n%s\n", strings.Join(targetPaths, "\n"))
 		editContext.SetTargetPaths(targetPaths)
 	} else {
 		fmt.Printf("Can't rename files")
@@ -87,5 +85,5 @@ func (command *EditCommand) Execute() {
 func getTargetPaths(text string) []string {
 	text = strings.TrimSpace(text)
 
-	return strings.Split(text, "\n")
+	return strings.Split(text, utils.NewLineSeparator)
 }
